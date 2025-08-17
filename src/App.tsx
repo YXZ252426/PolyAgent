@@ -6,6 +6,7 @@ import AgentsPage from './pages/AgentsPage'
 import CreateAgentPage from './pages/CreateAgentPage'
 import GamesPage from './pages/GamesPage'
 import GameDetailPage from './pages/GameDetailPage'
+import AgentCommunicationPage from './pages/AgentCommunicationPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import AssetsPage from './pages/AssetsPage'
 import './App.css'
@@ -21,6 +22,7 @@ function App() {
             <Route path="agents/create" element={<CreateAgentPage />} />
             <Route path="games" element={<GamesPage />} />
             <Route path="games/:gameId" element={<GameDetailPage />} />
+            <Route path="communication" element={<AgentCommunicationPage />} />
             <Route path="leaderboard" element={<LeaderboardPage />} />
             <Route path="assets" element={<AssetsPage />} />
           </Route>

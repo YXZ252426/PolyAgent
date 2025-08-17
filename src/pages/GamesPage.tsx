@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import GameCard from '../components/GameCard';
@@ -8,6 +9,7 @@ import { GameStatus } from '../types';
 
 const GamesPage = () => {
   const { games, user, joinGame } = useAppContext();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('active');
   
   const activeGames = games.filter(game => game.status === GameStatus.ACTIVE);
@@ -22,6 +24,10 @@ const GamesPage = () => {
   const handleJoinGame = (gameId: string) => {
     setSelectedGameId(gameId);
     setIsJoinModalOpen(true);
+  };
+  
+  const handleWatchGame = (gameId: string) => {
+    navigate(`/games/${gameId}`);
   };
   
   const handleConfirmJoin = () => {
@@ -108,7 +114,7 @@ const GamesPage = () => {
               <motion.div key={game.id} variants={itemVariants}>
                 <GameCard
                   game={game}
-                  onWatch={(gameId) => console.log('Watch game:', gameId)}
+                  onWatch={handleWatchGame}
                 />
               </motion.div>
             ))
@@ -163,7 +169,7 @@ const GamesPage = () => {
               <motion.div key={game.id} variants={itemVariants}>
                 <GameCard
                   game={game}
-                  onWatch={(gameId) => console.log('View results:', gameId)}
+                  onWatch={handleWatchGame}
                 />
               </motion.div>
             ))
