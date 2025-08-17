@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #4F46E5;
+  --secondary: #10B981;
+  --accent: #F43F5E;
+  --background: #111827;
+  --surface: #1F2937;
+  --text: #F9FAFB;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: var(--primary);
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+body {
+  margin: 0;
+  background-color: var(--background);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-all duration-300 ease-in-out;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-opacity-80 hover:shadow-lg hover:shadow-primary/20;
+  }
+
+  .btn-secondary {
+    @apply btn bg-secondary text-white hover:bg-opacity-80 hover:shadow-lg hover:shadow-secondary/20;
+  }
+
+  .btn-accent {
+    @apply btn bg-accent text-white hover:bg-opacity-80 hover:shadow-lg hover:shadow-accent/20;
+  }
+
+  .card {
+    @apply bg-surface rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-700/30 backdrop-blur-sm;
+  }
+
+  .glow {
+    @apply relative;
+  }
+
+  .glow::after {
+    content: '';
+    @apply absolute -inset-0.5 rounded-xl bg-gradient-to-r from-primary to-accent opacity-30 blur-sm -z-10;
+  }
+}
+
+/* Cyberpunk/Gamefi style scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--primary), var(--accent));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, var(--accent), var(--primary));
+}
