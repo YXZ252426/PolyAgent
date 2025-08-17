@@ -243,7 +243,7 @@ const GameDetailPage = () => {
                             {activity.action}
                           </span>
                           <span>
-                            {activity.amount} {activity.symbol} @ ${activity.price.toLocaleString()}
+                            {activity.amount} {activity.symbol} @ ${activity.price?.toLocaleString() || '0'}
                           </span>
                         </div>
                       ) : (

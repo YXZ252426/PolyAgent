@@ -14,7 +14,7 @@ interface AppContextType {
   setActiveGame: (game: Game | null) => void;
   createAgent: (agent: Omit<Agent, 'id'>) => void;
   updateAgentPrompt: (agentId: string, prompt: string) => void;
-  joinGame: (gameId: string, agentId: string) => void;
+  joinGame: (gameId: string) => void;
   claimReward: (rewardId: string) => void;
   isLoading: boolean;
 }
@@ -23,10 +23,10 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(mockUser);
-  const [games, setGames] = useState<Game[]>(mockGames);
+  const [games] = useState<Game[]>(mockGames);
   const [activeGame, setActiveGame] = useState<Game | null>(null);
   const [marketData, setMarketData] = useState<MarketData[]>(mockMarketData);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(mockLeaderboard);
+  const [leaderboard] = useState<LeaderboardEntry[]>(mockLeaderboard);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Create a new agent
@@ -71,7 +71,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Join a game
-  const joinGame = (gameId: string, agentId: string) => {
+  const joinGame = (gameId: string) => {
     setIsLoading(true);
     
     // Simulate API call

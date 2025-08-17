@@ -6,7 +6,7 @@ import { useAppContext } from '../contexts/AppContext';
 import { mockGameStats } from '../utils/mockData';
 
 const HomePage = () => {
-  const { games, leaderboard } = useAppContext();
+  const { games } = useAppContext();
   
   // Get active games count
   const activeGames = games.filter(game => game.status === 'ACTIVE').length;

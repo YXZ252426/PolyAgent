@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Card from '../components/Card';
 import { useAppContext } from '../contexts/AppContext';
-import { LeaderboardCategory, type LeaderboardCategoryValue } from '../types';
+import { LeaderboardCategory } from '../types';
 
 const LeaderboardPage = () => {
   const { leaderboard } = useAppContext();

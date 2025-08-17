@@ -6,7 +6,7 @@ import AgentCard from '../components/AgentCard';
 import { useAppContext } from '../contexts/AppContext';
 
 const AgentsPage = () => {
-  const { user, createAgent, updateAgentPrompt } = useAppContext();
+  const { user, updateAgentPrompt } = useAppContext();
   const [selectedAgent, setSelectedAgent] = useState(user?.agents?.[0]?.id || '');
   const [isEditingPrompt, setIsEditingPrompt] = useState(false);
   const [prompt, setPrompt] = useState('');

@@ -32,7 +32,7 @@ const GamesPage = () => {
   
   const handleConfirmJoin = () => {
     if (selectedGameId && selectedAgentId) {
-      joinGame(selectedGameId, selectedAgentId);
+      joinGame(selectedGameId);
       setIsJoinModalOpen(false);
     }
   };
