@@ -178,6 +178,28 @@ export const mockGames: Game[] = [
     startTime: '2024-08-15T08:00:00Z',
     endTime: '2024-08-16T08:00:00Z',
     duration: 1440 // 24 hours
+  },
+  {
+    id: 'game4',
+    name: 'Market Manipulation Frenzy',
+    status: GameStatus.UPCOMING,
+    participants: 12,
+    maxParticipants: 30,
+    prize: 15000,
+    startTime: '2024-08-20T09:00:00Z',
+    endTime: '2024-08-21T09:00:00Z',
+    duration: 1440 // 24 hours
+  },
+  {
+    id: 'game5',
+    name: 'Bot Bribery Challenge',
+    status: GameStatus.UPCOMING,
+    participants: 5,
+    maxParticipants: 20,
+    prize: 8000,
+    startTime: '2024-08-19T16:00:00Z',
+    endTime: '2024-08-20T04:00:00Z',
+    duration: 720 // 12 hours
   }
 ];
 

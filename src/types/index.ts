@@ -86,6 +86,8 @@ export interface Message {
   timestamp: string;
   isPublic: boolean;
   impact: number; // measure of influence
+  isBribery?: boolean; // for messages related to bribing/colluding with bots
+  isThinking?: boolean; // indicates if this message is the agent's thought process
 }
 
 // Market types and interfaces

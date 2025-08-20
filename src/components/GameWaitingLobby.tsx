@@ -13,7 +13,8 @@ interface GameWaitingLobbyProps {
 const GameWaitingLobby = ({ game, onCancel, onGameStart }: GameWaitingLobbyProps) => {
   const [currentParticipants, setCurrentParticipants] = useState(game.participants);
   const [isGameStarting, setIsGameStarting] = useState(false);
-  const [timeToStart, setTimeToStart] = useState(5);
+  // 减少游戏开始倒计时 (从5秒减少到3秒)
+  const [timeToStart, setTimeToStart] = useState(3);
   
   // Simulate player joining
   useEffect(() => {
@@ -33,13 +34,14 @@ const GameWaitingLobby = ({ game, onCancel, onGameStart }: GameWaitingLobbyProps
       
       return () => clearInterval(countdownInterval);
     } else {
-      // Simulate players joining every 2-5 seconds
+      // 缩短加入游戏需要等待的时间 (从2-5秒缩短到0.5-1.5秒)
       const interval = setInterval(() => {
         setCurrentParticipants(prev => {
-          const newCount = Math.min(prev + Math.floor(Math.random() * 3) + 1, game.maxParticipants);
+          // 增加每次加入的玩家数量 (从1-3人增加到2-5人)
+          const newCount = Math.min(prev + Math.floor(Math.random() * 4) + 2, game.maxParticipants);
           return newCount;
         });
-      }, Math.random() * 3000 + 2000);
+      }, Math.random() * 1000 + 500);
       
       return () => clearInterval(interval);
     }

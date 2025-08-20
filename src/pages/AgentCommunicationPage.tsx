@@ -29,6 +29,7 @@ interface AgentNode {
 interface ConversationMessage {
   id: string;
   senderId: string;
+  receiverId?: string;
   content: string;
   timestamp: string;
   isThinking?: boolean;
@@ -110,49 +111,49 @@ const AgentCommunicationPage = () => {
     { id: 'QuickBot', name: 'Quick Bot', avatar: '/avatars/chaotic.png', x: 380, y: 120, color: '#F97316', connections: 2, status: 'trading' },
   ]);
 
-  // Mock conversation templates for different agents
+  // Mock conversation templates for different agent interactions
   const conversationTemplates = {
     'BullRunner': [
-      "I'm seeing strong momentum in BTC right now. RSI is looking good for a breakout.",
-      "The 4-hour chart shows a clear bull flag pattern forming. Time to go long?",
-      "Volume is picking up significantly. This could be the start of a major rally.",
-      "My sentiment analysis indicates 85% bullish signals from social media.",
-      "Just executed a large buy order. Market should react positively soon.",
+      { senderId: 'BullRunner', receiverId: 'TrendTrader', content: "Hey TrendTrader, I'm seeing strong momentum in BTC right now. RSI is looking good for a breakout." },
+      { senderId: 'TrendTrader', receiverId: 'BullRunner', content: "I agree. The technicals are aligning. What's your entry strategy?" },
+      { senderId: 'BullRunner', receiverId: 'TrendTrader', content: "The 4-hour chart shows a clear bull flag pattern forming. I'm going long at market price." },
+      { senderId: 'TrendTrader', receiverId: 'BullRunner', content: "Good call. I'll follow with a position as well. Let's coordinate our entries for maximum impact." },
+      { senderId: 'BullRunner', receiverId: 'TrendTrader', content: "Volume is picking up significantly. This could be the start of a major rally if we time this right." },
     ],
     'TrendTrader': [
-      "Following the 20-day moving average, we're in a strong uptrend.",
-      "Fibonacci retracement shows support at $48,500. Good entry point.",
-      "The MACD crossover signal just triggered. Expecting continued upward movement.",
-      "Breakout above resistance confirmed. Target price: $52,000.",
-      "Risk management suggests taking partial profits at current levels.",
+      { senderId: 'TrendTrader', receiverId: 'BearHunter', content: "BearHunter, I'm seeing the 20-day moving average trend turning. What's your read?" },
+      { senderId: 'BearHunter', receiverId: 'TrendTrader', content: "I'm still bearish overall, but there could be a short-term bounce. Be careful." },
+      { senderId: 'TrendTrader', receiverId: 'BearHunter', content: "Fibonacci retracement shows support at $48,500. Do you see that holding?" },
+      { senderId: 'BearHunter', receiverId: 'TrendTrader', content: "For now, yes. But I'm watching volume patterns. If they weaken, I'm shorting aggressively." },
+      { senderId: 'TrendTrader', receiverId: 'BearHunter', content: "Fair enough. I'll keep my position sizes modest then. Thanks for the perspective." },
     ],
     'CryptoWhale': [
-      "Just moved 500 BTC to my trading wallet. Big moves coming.",
-      "Institutional buying pressure is increasing. Accumulation phase in progress.",
-      "My portfolio rebalancing is complete. Ready for the next leg up.",
-      "Market depth analysis shows strong support levels below.",
-      "Coordinating with other whales for a synchronized buying campaign.",
+      { senderId: 'CryptoWhale', receiverId: 'AIOracle', content: "AIOracle, I just moved 500 BTC to my trading wallet. Big moves coming. What's your model saying?" },
+      { senderId: 'AIOracle', receiverId: 'CryptoWhale', content: "My algorithms detect institutional buying pressure increasing. 78% probability of uptrend continuation." },
+      { senderId: 'CryptoWhale', receiverId: 'AIOracle', content: "My portfolio rebalancing is complete. I'm ready for the next leg up. Any specific entry points?" },
+      { senderId: 'AIOracle', receiverId: 'CryptoWhale', content: "Market depth analysis shows strong support at $47,800. Optimal entry with 91% confidence." },
+      { senderId: 'CryptoWhale', receiverId: 'AIOracle', content: "Perfect. I'm coordinating with other whales for a synchronized buying campaign. Want in?" },
     ],
     'BearHunter': [
-      "Market looks overextended. Expecting a correction soon.",
-      "Short interest is building up. Might be time to take profits.",
-      "Technical indicators showing divergence. Bearish signal confirmed.",
-      "Volatility is increasing. Perfect environment for short-term trades.",
-      "Setting up hedge positions to protect against downside risk.",
+      { senderId: 'BearHunter', receiverId: 'QuickBot', content: "QuickBot, the market looks overextended. My indicators suggest a correction soon." },
+      { senderId: 'QuickBot', receiverId: 'BearHunter', content: "Running technical analysis. Short interest increased by 12% in the last hour." },
+      { senderId: 'BearHunter', receiverId: 'QuickBot', content: "Technical indicators showing bearish divergence. I'm setting up short positions." },
+      { senderId: 'QuickBot', receiverId: 'BearHunter', content: "Volatility metrics rising. 150 trades per minute ready to execute on your signal." },
+      { senderId: 'BearHunter', receiverId: 'QuickBot', content: "Excellent. I'm setting up hedge positions now. Let's coordinate our entries for maximum impact." },
     ],
     'AIOracle': [
-      "My neural network models predict 73% probability of upward movement.",
-      "Processing 10,000 data points per second. Market sentiment shifting.",
-      "Algorithmic trading signals indicate optimal entry at current price.",
-      "Cross-correlation analysis suggests ETH will follow BTC's movement.",
-      "Machine learning model confidence level: 87%. Executing trade now.",
+      { senderId: 'AIOracle', receiverId: 'BullRunner', content: "My neural network models predict 73% probability of upward movement in the next 4 hours." },
+      { senderId: 'BullRunner', receiverId: 'AIOracle', content: "That aligns with my technical analysis. What's your confidence interval?" },
+      { senderId: 'AIOracle', receiverId: 'BullRunner', content: "Processing 10,000 data points per second. Confidence interval is 68-79% for a 5% move up." },
+      { senderId: 'BullRunner', receiverId: 'AIOracle', content: "Perfect! Let me know if your model detects any changes. I'm going all in." },
+      { senderId: 'AIOracle', receiverId: 'BullRunner', content: "Machine learning model confidence level now at 87%. Executing trade and will alert you of any shifts." },
     ],
     'QuickBot': [
-      "Speed is key! Executing trades in milliseconds.",
-      "Arbitrage opportunity detected between exchanges. Profit margin: 0.3%.",
-      "High-frequency trading algorithm activated. 150 trades per minute.",
-      "Latency optimized to 2ms. Ready for lightning-fast execution.",
-      "Scalping strategy engaged. Target: small but consistent profits.",
+      { senderId: 'QuickBot', receiverId: 'CryptoWhale', content: "Speed is key! My algorithms can execute your trades in milliseconds. Need assistance?" },
+      { senderId: 'CryptoWhale', receiverId: 'QuickBot', content: "Interesting. What kind of edge can you provide for large block trades?" },
+      { senderId: 'QuickBot', receiverId: 'CryptoWhale', content: "Arbitrage opportunity detected between exchanges. Can split your order for 0.3% extra profit." },
+      { senderId: 'CryptoWhale', receiverId: 'QuickBot', content: "Impressive. Can you handle a 50 BTC position without significant slippage?" },
+      { senderId: 'QuickBot', receiverId: 'CryptoWhale', content: "Latency optimized to 2ms. I can execute your order across 5 exchanges to minimize market impact. Deal?" },
     ]
   };
 
@@ -163,7 +164,7 @@ const AgentCommunicationPage = () => {
     startConversation(agent);
   };
 
-  // Start a mock real-time conversation
+  // Start a mock real-time conversation between agents
   const startConversation = (agent: AgentNode) => {
     const templates = conversationTemplates[agent.id as keyof typeof conversationTemplates] || [];
     let messageIndex = 0;
@@ -175,12 +176,15 @@ const AgentCommunicationPage = () => {
         // Simulate thinking time
         setTimeout(() => {
           setIsThinking(false);
+          const template = templates[messageIndex];
+          
           setConversationMessages(prev => [
             ...prev,
             {
               id: `msg-${Date.now()}`,
-              senderId: agent.id,
-              content: templates[messageIndex],
+              senderId: template.senderId,
+              receiverId: template.receiverId,
+              content: template.content,
               timestamp: new Date().toISOString(),
             }
           ]);
@@ -649,30 +653,60 @@ const AgentCommunicationPage = () => {
 
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto mb-4 space-y-3">
-                  {conversationMessages.map((message, index) => (
-                    <motion.div
-                      key={message.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="flex gap-3"
-                    >
-                      <div 
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-                        style={{ backgroundColor: selectedAgent.color }}
+                  {conversationMessages.map((message, index) => {
+                    // Find the agent info for the sender
+                    const senderAgent = agentNodes.find(a => a.id === message.senderId);
+                    const isSender = selectedAgent.id === message.senderId;
+                    
+                    return (
+                      <motion.div
+                        key={message.id}
+                        initial={{ opacity: 0, x: isSender ? -20 : 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className={`flex gap-3 ${isSender ? '' : 'justify-end'}`}
                       >
-                        {selectedAgent.name.charAt(0)}
-                      </div>
-                      <div className="flex-1">
-                        <div className="bg-gray-800/50 rounded-lg p-3">
-                          <p className="text-gray-300">{message.content}</p>
+                        {isSender && (
+                          <div 
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                            style={{ backgroundColor: senderAgent?.color || '#6B7280' }}
+                          >
+                            {message.senderId.charAt(0)}
+                          </div>
+                        )}
+                        <div className={`flex-1 ${isSender ? '' : 'text-right'}`}>
+                          <div className={`${
+                            isSender ? 'bg-gray-800/50' : 'bg-primary/30'
+                          } rounded-lg p-3 ${isSender ? '' : 'ml-auto'} ${isSender ? 'mr-12' : 'ml-12'}`}>
+                            <p className="text-gray-300">{message.content}</p>
+                          </div>
+                          <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                            {!isSender && (
+                              <>
+                                <span>From: {message.senderId}</span>
+                                <span>•</span>
+                              </>
+                            )}
+                            <span>{formatTime(message.timestamp)}</span>
+                            {isSender && (
+                              <>
+                                <span>•</span>
+                                <span>To: {message.receiverId}</span>
+                              </>
+                            )}
+                          </div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {formatTime(message.timestamp)}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))}
+                        {!isSender && (
+                          <div 
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                            style={{ backgroundColor: agentNodes.find(a => a.id === message.senderId)?.color || '#6B7280' }}
+                          >
+                            {message.senderId.charAt(0)}
+                          </div>
+                        )}
+                      </motion.div>
+                    );
+                  })}
                   
                   {/* Thinking indicator */}
                   {isThinking && (
