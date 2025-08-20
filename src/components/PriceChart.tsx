@@ -12,7 +12,7 @@ import {
   ComposedChart
 } from 'recharts';
 
-// 为 K 线图准备的扩展数据结构
+// Extended data structure for candlestick chart
 interface CandlestickData {
   time: string;
   open: number;
@@ -30,18 +30,18 @@ const PriceChart = ({ data }: PriceChartProps) => {
   const [selectedCoin, setSelectedCoin] = useState(data[0]?.symbol || '');
   const [timeframe, setTimeframe] = useState('1d'); // 1h, 4h, 1d, 1w
 
-  // 获取所选加密货币数据
+  // Get selected cryptocurrency data
   const selectedData = data.find(d => d.symbol === selectedCoin) || data[0];
   
-  // 价格变动颜色
+  // Price change color
   const priceChangeColor = 
     selectedData?.change > 0 ? 'text-green-500' : 
     selectedData?.change < 0 ? 'text-red-500' : 'text-gray-400';
   
-  // 根据选定的货币生成 K 线数据（模拟数据）
+  // Generate candlestick data based on selected currency (simulated data)
   const candlestickData = useMemo(() => {
-    // 生成随机的 K 线数据
-    // 在真实应用中，这将是来自 API 的历史数据
+    // Generate continuous candlestick data that evolves to the right
+    // In a real application, this would be historical data from an API
     const generateCandlestickData = (): CandlestickData[] => {
       const now = new Date();
       const basePrice = selectedData?.price || 50000;
@@ -50,7 +50,9 @@ const PriceChart = ({ data }: PriceChartProps) => {
                      timeframe === '4h' ? 96 :
                      timeframe === '1d' ? 24 : 7;
       
-      return Array.from({ length: periods }).map((_, i) => {
+      const result: CandlestickData[] = [];
+      
+      for (let i = 0; i < periods; i++) {
         // 根据索引创建时间，从过去到现在
         const time = new Date(now.getTime() - (periods - i) * (
           timeframe === '1h' ? 60 * 1000 :         // 每分钟一个点
@@ -59,23 +61,37 @@ const PriceChart = ({ data }: PriceChartProps) => {
           24 * 60 * 60 * 1000 / 7                  // 1周显示7个点，每天一个点
         ));
         
-        // 为每个时间段随机生成价格变化
-        const priceMove = (Math.random() - 0.45) * volatility; // 偏向上涨一点
-        const open = basePrice + (Math.random() - 0.5) * volatility * i / 10;
+        // 基于上一个收盘价生成这一周期的开盘价（第一个周期使用 basePrice）
+        const open = i === 0 ? basePrice : result[i - 1].close;
+        
+        // 基于开盘价生成价格变化，保持趋势连续性
+        // 使用偏移的随机数使价格更自然地波动，且有轻微的趋势性
+        // -0.45 而不是 -0.5 给予轻微的上涨偏向
+        const trend = i > 0 ? (result[i - 1].close > result[i - 1].open ? 0.05 : -0.05) : 0;
+        const priceMove = ((Math.random() - 0.45) + trend) * volatility;
+        
         const close = open + priceMove;
-        const high = Math.max(open, close) + Math.random() * volatility * 0.5;
-        const low = Math.min(open, close) - Math.random() * volatility * 0.5;
-        const volume = Math.floor(Math.random() * selectedData?.volume * 0.1) + selectedData?.volume * 0.01;
-
-        return {
+        
+        // 生成高低点，确保它们合理地围绕开盘和收盘价
+        const high = Math.max(open, close) + Math.random() * volatility * 0.3;
+        const low = Math.min(open, close) - Math.random() * volatility * 0.3;
+        
+        // 交易量也有一定的连续性，与价格变化幅度相关
+        const volumeBase = selectedData?.volume * 0.05;
+        const volumeVariation = Math.abs(priceMove) / volatility * selectedData?.volume * 0.08;
+        const volume = Math.floor(volumeBase + volumeVariation);
+        
+        result.push({
           time: `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`,
           open,
           close,
           high,
           low,
           volume
-        };
-      });
+        });
+      }
+      
+      return result;
     };
 
     return generateCandlestickData();
@@ -102,7 +118,7 @@ const PriceChart = ({ data }: PriceChartProps) => {
         return (
           <div className="p-2 text-xs bg-gray-800 border border-gray-700 rounded-md">
             <p className="mb-1 font-medium">{data.time}</p>
-            <p className="text-gray-300">交易量: <span className="text-white">${(data.volume / 1000000).toFixed(2)}M</span></p>
+            <p className="text-gray-300">Volume: <span className="text-white">${(data.volume / 1000000).toFixed(2)}M</span></p>
           </div>
         );
       }
@@ -111,11 +127,11 @@ const PriceChart = ({ data }: PriceChartProps) => {
       return (
         <div className="p-2 text-xs bg-gray-800 border border-gray-700 rounded-md">
           <p className="mb-1 font-medium">{data.time}</p>
-          <p className="text-gray-300">开盘价: <span className="text-white">${data.open.toLocaleString(undefined, {maximumFractionDigits: 2})}</span></p>
-          <p className="text-gray-300">收盘价: <span className={data.close >= data.open ? "text-green-500" : "text-red-500"}>${data.close.toLocaleString(undefined, {maximumFractionDigits: 2})}</span></p>
-          <p className="text-gray-300">最高价: <span className="text-green-400">${data.high.toLocaleString(undefined, {maximumFractionDigits: 2})}</span></p>
-          <p className="text-gray-300">最低价: <span className="text-red-400">${data.low.toLocaleString(undefined, {maximumFractionDigits: 2})}</span></p>
-          <p className="text-gray-300">交易量: <span className="text-blue-400">${(data.volume / 1000000).toFixed(2)}M</span></p>
+          <p className="text-gray-300">Open: <span className="text-white">${data.open.toLocaleString(undefined, {maximumFractionDigits: 2})}</span></p>
+          <p className="text-gray-300">Close: <span className={data.close >= data.open ? "text-green-500" : "text-red-500"}>${data.close.toLocaleString(undefined, {maximumFractionDigits: 2})}</span></p>
+          <p className="text-gray-300">High: <span className="text-green-400">${data.high.toLocaleString(undefined, {maximumFractionDigits: 2})}</span></p>
+          <p className="text-gray-300">Low: <span className="text-red-400">${data.low.toLocaleString(undefined, {maximumFractionDigits: 2})}</span></p>
+          <p className="text-gray-300">Volume: <span className="text-blue-400">${(data.volume / 1000000).toFixed(2)}M</span></p>
         </div>
       );
     }
