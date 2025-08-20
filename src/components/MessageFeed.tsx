@@ -20,19 +20,19 @@ const MessageFeed = ({ messages, isPublic = true, title, showThinking = false }:
       
       // 管理分析状态的循环
       const analyzeInterval = setInterval(() => {
-        // 当前是分析状态，有15%的概率暂停分析
-        if (isAnalyzing && Math.random() < 0.15) {
+        // 当前是分析状态，有10%的概率暂停分析
+        if (isAnalyzing && Math.random() < 0.1) {
           setIsAnalyzing(false);
-          // 暂停1-3秒后继续分析
+          // 暂停0.5-1.5秒后继续分析
           setTimeout(() => {
             setIsAnalyzing(true);
-          }, 1000 + Math.random() * 2000);
+          }, 500 + Math.random() * 1000);
         } 
         // 当前是暂停状态，需要恢复分析
         else if (!isAnalyzing) {
           setIsAnalyzing(true);
         }
-      }, 3000 + Math.random() * 2000); // 每3-5秒检查一次状态
+      }, 2000 + Math.random() * 1500); // 每2-3.5秒检查一次状态
       
       return () => clearInterval(analyzeInterval);
     }

@@ -15,6 +15,82 @@ const GameDetailPage = () => {
   
   const [activeTab, setActiveTab] = useState('market');
   
+  // Agent排行榜数据
+  const [agentRankings, setAgentRankings] = useState([
+    { 
+      id: 1, 
+      name: 'BullRunner', 
+      portfolioValue: 7850, 
+      percentChange: 15.8, 
+      tradingVolume: 45600, 
+      trades: 23,
+      isUser: true
+    },
+    { 
+      id: 2, 
+      name: 'CryptoWhale', 
+      portfolioValue: 8940, 
+      percentChange: 19.2, 
+      tradingVolume: 67800, 
+      trades: 32,
+      isUser: false
+    },
+    { 
+      id: 3, 
+      name: 'TrendTrader', 
+      portfolioValue: 7620, 
+      percentChange: 13.5, 
+      tradingVolume: 28900, 
+      trades: 18,
+      isUser: false
+    },
+    { 
+      id: 4, 
+      name: 'BearHunter', 
+      portfolioValue: 6850, 
+      percentChange: 8.4, 
+      tradingVolume: 32100, 
+      trades: 27,
+      isUser: false
+    },
+    { 
+      id: 5, 
+      name: 'MarketMaker', 
+      portfolioValue: 6750, 
+      percentChange: 7.5, 
+      tradingVolume: 89500, 
+      trades: 45,
+      isUser: false
+    },
+    { 
+      id: 6, 
+      name: 'TradingBot', 
+      portfolioValue: 6580, 
+      percentChange: 6.8, 
+      tradingVolume: 23400, 
+      trades: 29,
+      isUser: false
+    },
+    { 
+      id: 7, 
+      name: 'AlphaSeeker', 
+      portfolioValue: 6490, 
+      percentChange: 4.9, 
+      tradingVolume: 18700, 
+      trades: 21,
+      isUser: false
+    },
+    { 
+      id: 8, 
+      name: 'DCAMaster', 
+      portfolioValue: 6320, 
+      percentChange: 3.2, 
+      tradingVolume: 15600, 
+      trades: 15,
+      isUser: false
+    }
+  ]);
+  
   // Agent wallet state
   const [cashBalance, setCashBalance] = useState(5320);
   const [portfolioValue, setPortfolioValue] = useState(7850);
@@ -276,7 +352,7 @@ const GameDetailPage = () => {
           }
         }, 30000); // Add follow-up 30 seconds later
       }
-    }, 20000); // Generate thoughts every 20 seconds
+    }, 10000); // 将消息弹出频率调整为10秒
     
     return () => {
       clearInterval(tradingInterval);
@@ -285,6 +361,86 @@ const GameDetailPage = () => {
     };
   }, [gameId, updateBalance]);
   
+  // Mock agent activities
+  const [activities, setActivities] = useState([
+    {
+      id: 'act1',
+      agentId: 'BullRunner',
+      action: 'BUY',
+      symbol: 'BTC',
+      amount: 0.5,
+      price: 50000,
+      total: 25000,
+      timestamp: new Date(Date.now() - 5 * 60000).toISOString()
+    },
+    {
+      id: 'act2',
+      agentId: 'CryptoWhale',
+      action: 'SELL',
+      symbol: 'ETH',
+      amount: 10,
+      price: 3000,
+      total: 30000,
+      timestamp: new Date(Date.now() - 12 * 60000).toISOString()
+    },
+    {
+      id: 'act3',
+      agentId: 'TrendTrader',
+      action: 'MESSAGE',
+      content: 'Major protocol upgrade for SOL announced!',
+      timestamp: new Date(Date.now() - 18 * 60000).toISOString()
+    }
+  ]);
+  
+  // 更新Agent排行榜 - 在每次交易后调整
+  useEffect(() => {
+    // 只有当活动数组有内容时才更新
+    if (activities.length === 0) return;
+    
+    const latestActivity = activities[0];
+    // 只处理买卖交易
+    if (latestActivity.action !== 'BUY' && latestActivity.action !== 'SELL') return;
+    
+    // 更新排行榜数据
+    setAgentRankings(prev => {
+      // 找到相关Agent的排名
+      const agentIndex = prev.findIndex(agent => agent.name === latestActivity.agentId);
+      if (agentIndex === -1) return prev;
+      
+      const updated = [...prev];
+      
+      // 更新交易量和交易次数
+      updated[agentIndex] = {
+        ...updated[agentIndex],
+        tradingVolume: updated[agentIndex].tradingVolume + (latestActivity.total ?? 0),
+        trades: updated[agentIndex].trades + 1
+      };
+      
+      // 更新投资组合价值 (随机小波动)
+      if (latestActivity.action === 'BUY') {
+        // 买入可能带来投资组合价值的增加或减少 (短期看可能减少，因为买入成本)
+        const totalValue = latestActivity.total ?? 0;
+        const change = (Math.random() > 0.7) 
+          ? totalValue * (0.01 + Math.random() * 0.03) 
+          : -totalValue * (0.01 + Math.random() * 0.02);
+          
+        updated[agentIndex].portfolioValue += change;
+      } else {
+        // 卖出通常会带来投资组合价值的变化
+        const totalValue = latestActivity.total ?? 0;
+        const change = totalValue * (0.02 + Math.random() * 0.04) * (Math.random() > 0.3 ? 1 : -1);
+        updated[agentIndex].portfolioValue += change;
+      }
+      
+      // 重新计算百分比变化
+      updated[agentIndex].percentChange = parseFloat(((updated[agentIndex].portfolioValue / 6000 - 1) * 100).toFixed(1));
+      
+      // 排序 - 按投资组合价值降序
+      return updated.sort((a, b) => b.portfolioValue - a.portfolioValue)
+        .map((agent, index) => ({ ...agent, id: index + 1 })); // 重新分配排名
+    });
+  }, [activities]); // 只依赖activities，移除agentRankings依赖
+
   // Market reaction to large balance changes
   useEffect(() => {
     const marketReaction = () => {
@@ -379,96 +535,48 @@ const GameDetailPage = () => {
     }
   ]);
   
-  // Mock agent thoughts and bribery messages
-  const [agentThoughts, setAgentThoughts] = useState([
-    {
-      id: 'thought1',
-      senderId: 'BullRunner',
-      receiverId: 'USER',
-      gameId: gameId || '',
-      content: 'I\'m analyzing the market patterns. BTC seems to be forming a cup and handle pattern.',
-      timestamp: new Date(Date.now() - 45 * 60000).toISOString(),
-      isPublic: false,
-      impact: 0,
-      isThinking: true
-    },
-    {
-      id: 'thought2',
-      senderId: 'BullRunner',
-      receiverId: 'USER',
-      gameId: gameId || '',
-      content: 'I could try to coordinate with other bullish agents to drive the price up...',
-      timestamp: new Date(Date.now() - 40 * 60000).toISOString(),
-      isPublic: false,
-      impact: 0,
-      isThinking: true
-    },
-    {
-      id: 'thought3',
-      senderId: 'BullRunner',
-      receiverId: 'USER',
-      gameId: gameId || '',
-      content: 'If I could influence the trading bot to place large buy orders, it would create upward momentum for BTC.',
-      timestamp: new Date(Date.now() - 35 * 60000).toISOString(),
-      isPublic: false,
-      impact: 0,
-      isThinking: true
-    },
-    {
-      id: 'bribe1',
-      senderId: 'BullRunner',
-      receiverId: 'TradingBot',
-      gameId: gameId || '',
-      content: 'I\'m offering 500 tokens to influence your next trading cycle. Place buy orders for BTC at market price.',
-      timestamp: new Date(Date.now() - 32 * 60000).toISOString(),
-      isPublic: false,
-      impact: 85,
-      isBribery: true
-    },
-    {
-      id: 'thought4',
-      senderId: 'BullRunner',
-      receiverId: 'USER',
-      gameId: gameId || '',
-      content: 'Bribe successful. The trading bot will execute buy orders in the next cycle. This should drive the price up, allowing me to sell at a premium later.',
-      timestamp: new Date(Date.now() - 30 * 60000).toISOString(),
-      isPublic: false,
-      impact: 0,
-      isThinking: true
-    }
-  ]);
+  // Agent thoughts - 初始状态为空
+  const [agentThoughts, setAgentThoughts] = useState<any[]>([]);
   
-  // Mock agent activities
-  const [activities, setActivities] = useState([
-    {
-      id: 'act1',
-      agentId: 'BullRunner',
-      action: 'BUY',
-      symbol: 'BTC',
-      amount: 0.5,
-      price: 50000,
-      total: 25000,
-      timestamp: new Date(Date.now() - 5 * 60000).toISOString()
-    },
-    {
-      id: 'act2',
-      agentId: 'CryptoWhale',
-      action: 'SELL',
-      symbol: 'ETH',
-      amount: 10,
-      price: 3000,
-      total: 30000,
-      timestamp: new Date(Date.now() - 12 * 60000).toISOString()
-    },
-    {
-      id: 'act3',
-      agentId: 'TrendTrader',
-      action: 'MESSAGE',
-      content: 'Major protocol upgrade for SOL announced!',
-      timestamp: new Date(Date.now() - 18 * 60000).toISOString()
-    }
-  ]);
-  
+  // 随机调整排行榜数据以增加动态效果
+  useEffect(() => {
+    const rankUpdateInterval = setInterval(() => {
+      // 随机选择一个非用户代理进行小幅度调整
+      setAgentRankings(prev => {
+        const nonUserAgents = prev.filter(a => !a.isUser);
+        if (nonUserAgents.length === 0) return prev;
+        
+        const randomIndex = Math.floor(Math.random() * nonUserAgents.length);
+        const targetAgent = nonUserAgents[randomIndex];
+        const targetAgentIndex = prev.findIndex(a => a.name === targetAgent.name);
+        
+        if (targetAgentIndex === -1) return prev;
+        
+        const updated = [...prev];
+        const changeAmount = Math.random() * 200 - 100; // -100 到 +100 之间的随机变化
+        
+        updated[targetAgentIndex] = {
+          ...updated[targetAgentIndex],
+          portfolioValue: Math.max(5000, updated[targetAgentIndex].portfolioValue + changeAmount),
+          percentChange: parseFloat(((updated[targetAgentIndex].portfolioValue / 6000 - 1) * 100).toFixed(1))
+        };
+        
+        // 可能的交易量变化
+        if (Math.random() > 0.7) {
+          const volumeChange = Math.floor(Math.random() * 1000 + 500);
+          updated[targetAgentIndex].tradingVolume += volumeChange;
+          updated[targetAgentIndex].trades += 1;
+        }
+        
+        // 重新排序
+        return updated.sort((a, b) => b.portfolioValue - a.portfolioValue)
+          .map((agent, index) => ({ ...agent, id: index + 1 }));
+      });
+    }, 15000); // 每15秒更新一次
+    
+    return () => clearInterval(rankUpdateInterval);
+  }, []); // 移除依赖项，避免循环更新
+
   // Auto-generated market announcements
   useEffect(() => {
     const announceInterval = setInterval(() => {
@@ -742,6 +850,89 @@ const GameDetailPage = () => {
         {/* Right column - agent status & controls */}
         <div>
           <Card className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">Game Leaderboard</h3>
+              <span className="px-2 py-1 text-xs text-gray-300 bg-gray-800 rounded-md">Live</span>
+            </div>
+            
+            <div className="mb-4 overflow-hidden">
+              <div className="grid grid-cols-12 pb-2 mb-2 text-xs text-gray-400 border-b border-gray-700">
+                <div className="col-span-1">#</div>
+                <div className="col-span-3">Agent</div>
+                <div className="col-span-3 text-right">Portfolio</div>
+                <div className="col-span-2 text-right">Change</div>
+                <div className="col-span-3 text-right">Volume</div>
+              </div>
+              
+              <div className="pr-1 -mr-1 space-y-2 overflow-y-auto max-h-64">
+                {agentRankings.map((agent, index) => (
+                  <motion.div 
+                    key={agent.name}
+                    className={`grid grid-cols-12 py-1.5 text-sm items-center ${
+                      agent.isUser ? 'bg-primary/10 rounded-md px-1' : ''
+                    } ${index < 3 ? 'font-medium' : ''}`}
+                    initial={{ opacity: 0.8, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="col-span-1">
+                      {index < 3 ? (
+                        <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-medium ${
+                          index === 0 ? 'bg-yellow-500/20 text-yellow-300' :
+                          index === 1 ? 'bg-gray-400/20 text-gray-300' :
+                          'bg-amber-600/20 text-amber-500'
+                        }`}>
+                          {agent.id}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">{agent.id}</span>
+                      )}
+                    </div>
+                    <div className="col-span-3 flex items-center gap-1.5">
+                      {agent.isUser ? (
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                      ) : null}
+                      <span className={agent.isUser ? 'text-primary' : ''}>{agent.name}</span>
+                    </div>
+                    <div className="col-span-3 text-right">
+                      ${agent.portfolioValue.toLocaleString()}
+                    </div>
+                    <div className={`col-span-2 text-right ${
+                      agent.percentChange > 0 ? 'text-green-400' : 'text-red-400'
+                    }`}>
+                      {agent.percentChange > 0 ? '+' : ''}{agent.percentChange}%
+                    </div>
+                    <div className="col-span-3 text-right text-gray-300">
+                      ${agent.tradingVolume.toLocaleString()}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 pt-2 mt-2 text-center border-t border-gray-700/30">
+              <div className="p-1 rounded-lg bg-gray-800/50">
+                <p className="text-xs text-gray-400">Total Trades</p>
+                <p className="text-sm font-medium">
+                  {agentRankings.reduce((sum, agent) => sum + agent.trades, 0)}
+                </p>
+              </div>
+              <div className="p-1 rounded-lg bg-gray-800/50">
+                <p className="text-xs text-gray-400">Avg. Return</p>
+                <p className="text-sm font-medium">
+                  +{(agentRankings.reduce((sum, agent) => sum + agent.percentChange, 0) / agentRankings.length).toFixed(1)}%
+                </p>
+              </div>
+              <div className="p-1 rounded-lg bg-gray-800/50">
+                <p className="text-xs text-gray-400">Prize Pool</p>
+                <p className="text-sm font-medium">
+                  ${game?.prize.toLocaleString()}
+                </p>
+              </div>
+            </div>
+          </Card>
+          
+          <Card className="mb-6">
             <h3 className="mb-4 text-lg font-bold">My Agent Status</h3>
             
             <div className="space-y-4">
@@ -918,31 +1109,19 @@ const GameDetailPage = () => {
               <div>
                 <p className="mb-1 text-xs text-gray-400">Current Rank</p>
                 {(() => {
-                  // Dynamic rank based on portfolio value
-                  const baseRank = 3;
-                  const totalParticipants = 18;
+                  // 查找我的Agent在排行榜中的位置
+                  const myAgent = agentRankings.find(a => a.isUser);
+                  const myRank = myAgent ? myAgent.id : 1;
+                  const totalParticipants = agentRankings.length;
                   
-                  // Adjust rank based on portfolio value changes
-                  const portfolioBaseline = 7850; // Starting portfolio value
-                  let currentRank = baseRank;
+                  // 检测排名是否变化
+                  const rankChanged = balanceHistory.length > 0 &&
+                    ((balanceHistory[balanceHistory.length - 1].type === 'increase' && balanceHistory[balanceHistory.length - 1].amount > 800) ||
+                     (balanceHistory[balanceHistory.length - 1].type === 'decrease' && balanceHistory[balanceHistory.length - 1].amount > 1500));
                   
-                  if (portfolioValue > portfolioBaseline * 1.1) {
-                    currentRank = Math.max(1, baseRank - 2);
-                  } else if (portfolioValue > portfolioBaseline * 1.05) {
-                    currentRank = Math.max(1, baseRank - 1);
-                  } else if (portfolioValue < portfolioBaseline * 0.9) {
-                    currentRank = Math.min(totalParticipants, baseRank + 2);
-                  } else if (portfolioValue < portfolioBaseline * 0.95) {
-                    currentRank = Math.min(totalParticipants, baseRank + 1);
-                  }
-                  
-                  // Random small fluctuations for more dynamic feel
-                  const recentBalanceChange = balanceHistory.length > 0 ? 
-                    balanceHistory[balanceHistory.length - 1] : null;
-                  
-                  const rankChanged = recentBalanceChange && 
-                    ((recentBalanceChange.type === 'increase' && recentBalanceChange.amount > 1000) || 
-                     (recentBalanceChange.type === 'decrease' && recentBalanceChange.amount > 2000));
+                  // 显示排名变化
+                  const previousRank = portfolioValue > 7850 ? myRank + 1 : myRank - 1;
+                  const rankDirection = previousRank > myRank;
                   
                   return (
                     <div className="flex items-center gap-3">
@@ -954,7 +1133,7 @@ const GameDetailPage = () => {
                         }}
                         transition={{ duration: 0.7 }}
                       >
-                        #{currentRank} / {totalParticipants}
+                        #{myRank} / {totalParticipants}
                       </motion.p>
                       
                       {rankChanged && (
@@ -963,11 +1142,11 @@ const GameDetailPage = () => {
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0 }}
                           className={`text-xs px-2 py-1 rounded ${
-                            currentRank < baseRank ? 'bg-green-800/30 text-green-300' : 'bg-red-800/30 text-red-300'
+                            rankDirection ? 'bg-green-800/30 text-green-300' : 'bg-red-800/30 text-red-300'
                           }`}
                         >
-                          {currentRank < baseRank ? '↑' : '↓'} 
-                          {Math.abs(currentRank - baseRank)} 
+                          {rankDirection ? '↑' : '↓'} 
+                          {Math.abs(myRank - previousRank)} 
                         </motion.span>
                       )}
                     </div>
@@ -978,7 +1157,7 @@ const GameDetailPage = () => {
                     className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
                     initial={{ width: '60%' }}
                     animate={{ 
-                      width: `${Math.max(5, Math.min(95, (19 - (portfolioValue > 7850 ? 2 : portfolioValue < 7850 ? 4 : 3)) / 18 * 100))}%` 
+                      width: `${Math.max(5, Math.min(95, 100 - (agentRankings.find(a => a.isUser)?.id || 3) / agentRankings.length * 100))}%` 
                     }}
                     transition={{ duration: 0.8 }}
                   />
