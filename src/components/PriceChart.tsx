@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { useState, useMemo } from 'react';
 import type { MarketData } from '../types';
 import {
